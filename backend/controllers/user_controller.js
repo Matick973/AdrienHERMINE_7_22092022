@@ -1,7 +1,6 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const User = require('../models/user_model')
-const cookieParser = require("cookie-parser");
 const fs = require('fs');
 const { signUpErrors } = require('../utils/errors_utils');
 
@@ -31,10 +30,10 @@ exports.signup = (req, res, next) => {
 
             user.save()
 
-                .then(() => res.status(201).json({ message: 'utilisateur crée' })) // ressource créée
-                .catch((err) => {                                                 // Error 500 server
-                    let errors = signUpErrors(err);
-                    res.status(500).send({ errors })
+                .then(() => res.status(201).json({ message: 'Bienvenue !' })) // ressource créée
+                .catch((err) => {                                                 
+                    let errors = signUpErrors(err);                            //Gestionnaire d'erreurs
+                    res.status(500).send({ errors })                        
                 })
         })
         .catch(error => res.status(500).json({ error })); // Error 500 server
@@ -45,19 +44,20 @@ exports.login = (req, res, next) => {
     User.findOne({ email: req.body.email })
         .then(user => {
             if (!user) {
-                return res.status(401).json({ error: 'Utilisateur non trouvé !' }); // Error 401 Unauthorized
+                return res.status(401).json({ error: 'Utilisateur ou Mot de passe incorrect !' }); // Error 401 Unauthorized
             }
             bcrypt.compare(req.body.password, user.password)
 
                 .then(valid => {
 
                     if (!valid) {
-                        return res.status(401).json({ error: 'Mot de passe incorrect !' }); // Error 401 Unauthorized
+                        return res.status(401).json({ error: 'Mot de passe ou Utilisateur incorrect !' }); // Error 401 Unauthorized
                     }
 
                     const token = jwt.sign({ userId: user._id }, 'STUDENT_TOKEN_OCR_2022_FOR/P7&20220922', { expiresIn: '72h' })
 
-                    res.cookie("access_token", token, { httpOnly: true, secure: false }).status(200).json({ message: "Logged in successfully" });
+                    res.cookie("access_token", token, { httpOnly: true, secure: false })
+                    res.status(200).json({ user: user._id });
 
                 })
                 .catch(error => res.status(500).json({ error })); // Error 500 server

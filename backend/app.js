@@ -5,7 +5,8 @@ const listEndpoints = require('express-list-endpoints')
 const bodyParser = require('body-parser')
 const cookieParser = require("cookie-parser")
 const userRoutes = require('./routes/user_route')
-const postRoutes = require('./routes/post_route')
+const postRoutes = require('./routes/post_route');
+const auth = require('./middleware/auth');
 
 // Utilisation de variables d'environnement
 const dotenv = require('dotenv').config({ path: './config/.env' })
@@ -28,14 +29,15 @@ mongoose.connect(`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASS
 
 //CORS  (système de sécurité qui, par défaut, bloque les appels HTTP entre des serveurs différents)
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    res.setHeader('Access-Control-Allow-Credentials', true)
     next();
 });
 
 //apps(routes sauces, authentification et images)
-
+app.get('/auth', auth, (req, res) => { res.status(200).send(req.auth.userId)})
 app.use('/api/auth/post/', postRoutes)
 app.use('/api/auth/user/', userRoutes)
 app.use('/images', express.static(path.join(__dirname, 'images')))

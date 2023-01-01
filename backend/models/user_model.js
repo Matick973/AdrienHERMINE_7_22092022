@@ -5,7 +5,7 @@ const { isEmail } = require('validator')
 const userSchema = mongoose.Schema({
     pseudo: { type: String, require: true, unique: true, trim: true, minlength: 3, maxlength: 50 },
     email: { type: String, require: true, unique: true, validate: [isEmail] },                            // String — adresse e-mail de l'utilisateur [unique]
-    password: { type: String, require: true },                                                            // String — mot de passe de l'utilisateur haché
+    password: { type: String, require: true, minlength: 4 },                                                            // String — mot de passe de l'utilisateur haché
     bio: { type: String, require: true, max: 300 },
     imageUrl: { type: String, require:true},
 },

@@ -1,4 +1,3 @@
-
 exports.likePost = async (req, res, next) => {                                      // Fonction asynchrone car plusieur requete en meme temps
     const UserID = req.body.userId
     await Post.findOne({ _id: req.params.id })                                       // Ciblage de l'élément
@@ -127,3 +126,15 @@ exports.likePost = async (req, res, next) => {
                 res.status(500).json({ error });
             });
     };
+
+    exports.signInErrors  = (err) => {
+        let errors = {email: '', password:''}
+    
+        if (err.message.includes('email'))
+            errors.email = "Email inconnu !"
+    
+        if (err.message.includes('password'))
+            errors.password = "Mot de passe incorrect !"
+            
+    return errors
+    }
