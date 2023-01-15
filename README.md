@@ -1,1 +1,37 @@
 # AdrienHERMINE_7_22092022
+
+FRONTEND :
+    CD FRONTEND >>> YARN START 
+
+    PORT 3000 !!!
+
+    REACT
+
+BACKEND :
+    CD BACKEND >>> NODEMON SERVER
+
+    PORT 5000 !!!
+
+    EXPRESS
+
+BASE DE DONNEES :
+
+    MONGODB
+
+COMPTE ADMIN :
+
+    admin@test.com
+    Admin1
+
+COMPTE UTILISATEUR :
+
+    testman@test.com
+    Test1
+
+INSCRIPTION :
+
+    LE MDP DOIT CONTENIR {
+        UNE MAJUSCULE
+        UN CHIFFRE MINIMUM
+        4 CHARACTERE MINIMUM
+    }
