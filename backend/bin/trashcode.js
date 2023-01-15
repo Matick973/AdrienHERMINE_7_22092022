@@ -138,3 +138,20 @@ exports.likePost = async (req, res, next) => {
             
     return errors
     }
+
+                
+    for (let g = 0, h = res.data.User.length; g < h; g++) {
+        if (res.data.User[g]._id === post.userId) {
+            
+            setAutor = {
+            "id" : post._id,
+            "pseudo" : res.data.User[g].pseudo,
+            }
+            
+        }
+
+    console.log(res.data.User[g].pseudo)
+    console.log(post.userId) 
+    }
+
+//setAutor(res.data);

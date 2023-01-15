@@ -9,7 +9,7 @@ exports.signup = (req, res, next) => {
 
     const userObject = req.file ? {
         ...JSON.parse(req.body.user),
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+        image: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : { ...req.body };
 
     console.log("userObject", userObject)
@@ -54,10 +54,10 @@ exports.login = (req, res, next) => {
                         return res.status(401).json({ error: 'Mot de passe ou Utilisateur incorrect !' }); // Error 401 Unauthorized
                     }
 
-                    const token = jwt.sign({ userId: user._id }, 'STUDENT_TOKEN_OCR_2022_FOR/P7&20220922', { expiresIn: '72h' })
+                    const token = jwt.sign({ userId: user._id, admin: user.admin }, 'STUDENT_TOKEN_OCR_2022_FOR/P7&20220922', { expiresIn: '72h' })
 
                     res.cookie("access_token", token, { httpOnly: true, secure: false })
-                    res.status(200).json({ user: user._id });
+                    res.status(200).json({ user: user._id, admin: user.admin });
 
                 })
                 .catch(error => res.status(500).json({ error })); // Error 500 server
@@ -90,7 +90,7 @@ exports.modifyUser = (req, res, next) => {
 
     const userObject = req.file ? {
         ...JSON.parse(req.body.user),
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+        image: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : { ...req.body };
 
     delete userObject._userId;
@@ -130,7 +130,7 @@ exports.deleteUser = (req, res, next) => {
             } else {
 
                 if (User.imageUrl) {
-                    const filename = User.imageUrl.split('/images/')[1];
+                    const filename = User.image.split('/images/')[1];
                     fs.unlink(`images/${filename}`, () => {
                         User.deleteOne({ _id: req.params.id })
                             .then(() => { res.clearCookie("access_token").status(200).json({ message: 'Compte désactivé!' }) })

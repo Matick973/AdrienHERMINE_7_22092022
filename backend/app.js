@@ -36,11 +36,12 @@ app.use((req, res, next) => {
     next();
 });
 
-//apps(routes sauces, authentification et images)
+//apps(routes posts, authentification et images)
+
+app.use('/images', express.static(path.join(__dirname, 'images')))
 app.get('/auth', auth, (req, res) => { res.status(200).send(req.auth.userId)})
 app.use('/api/auth/post/', postRoutes)
 app.use('/api/auth/user/', userRoutes)
-app.use('/images', express.static(path.join(__dirname, 'images')))
 
 console.log(listEndpoints(app));
 

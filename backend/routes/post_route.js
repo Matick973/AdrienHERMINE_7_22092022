@@ -13,5 +13,6 @@ router.put('/:id', auth, multer, postCtrl.modifyPost)
 router.delete('/:id', auth, postCtrl.deletePost)
 router.patch('/like/:id', postCtrl.likePost)
 router.get('/', auth, postCtrl.allPost)
+router.get('/:id', auth, postCtrl.onePost)
 
 module.exports = router

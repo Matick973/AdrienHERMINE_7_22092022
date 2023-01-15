@@ -3,7 +3,7 @@ const mongoose = require('mongoose') //npm install mongoose
 const postSchema = mongoose.Schema({
     userId: { type: String, require: true },
     message: { type: String, maxlength: 600, trim: true },
-    imageUrl : {type: String},
+    image : { type: String },
     likes: { type: Number, require: true, default: 0 }, // default 0 pour éviter Bug "NaN" avant like
     dislikes: { type: Number, require: true, default: 0 }, // default 0 pour éviter Bug "NaN" avant dislike
     likers: { type: [String], require: true },

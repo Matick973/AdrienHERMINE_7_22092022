@@ -7,7 +7,8 @@ const userSchema = mongoose.Schema({
     email: { type: String, require: true, unique: true, validate: [isEmail] },                            // String — adresse e-mail de l'utilisateur [unique]
     password: { type: String, require: true, minlength: 4 },                                                            // String — mot de passe de l'utilisateur haché
     bio: { type: String, require: true, max: 300 },
-    imageUrl: { type: String, require:true},
+    image: { type: String },
+    admin: {type: Boolean, require: true, default:false}
 },
     { timestamps: true }
 )

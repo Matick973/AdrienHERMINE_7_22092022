@@ -1,30 +1,39 @@
 const Post = require('../models/post_model')
+const User = require('../models/user_model')
 const fs = require('fs');
 
 // Logique métier création d'un post :
-exports.createPost = async (req, res, next) => {
-
-    const postObject = req.file ? {
-        ...JSON.parse(req.body.post),
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+exports.createPost = (req, res, next) => {
+    
+    const postObject = req.file ? 
+    {
+        image: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : { ...req.body };
-
-    console.log("postObject", postObject)
 
     delete postObject._id;
     delete postObject._userId;
 
+    console.log("postObject", postObject)
+
     const post = new Post({
         ...postObject,
-        userId: req.auth.userId
+        userId: req.auth.userId,
+        message : req.body.message,
     })
 
     post.save()
 
-        .then(post => res.status(200).json(post))
-        .catch(error => res.status(400).json({ error }))
+    .then(post => res.status(200).json(post))
+    .catch(error => res.status(400).json({ error }))
 
 }
+
+// Logique métier accès All post :
+exports.onePost = (req, res, next) => {
+    Post.findOne( {_id: req.params.id} )
+        .then(posts => res.status(200).json(posts))
+        .catch(error => res.status(400).json({ error }))
+};
 
 // Logique métier accès All post :
 exports.allPost = (req, res, next) => {
@@ -36,9 +45,10 @@ exports.allPost = (req, res, next) => {
 
 // Logique métier modification d'un post :
 exports.modifyPost = (req, res, next) => {
-    const postObject = req.file ? {
-        ...JSON.parse(req.body.post),
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+
+    const postObject = req.file ? 
+    {
+        image: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : { ...req.body };
 
     delete postObject._userId;
@@ -47,7 +57,7 @@ exports.modifyPost = (req, res, next) => {
 
         .then((modifiedPost) => {
 
-            if (modifiedPost.userId != req.auth.userId) {
+            if (modifiedPost.userId != req.auth.userId && !req.auth.admin) {
 
                 res.status(401).json({ message: 'Not authorized' });
 
@@ -68,23 +78,29 @@ exports.deletePost = (req, res, next) => {
     Post.findOne({ _id: req.params.id })
 
         .then(Post => {
-            if (Post.userId != req.auth.userId) {
+          
+            console.log(req.auth.admin)
 
-                res.status(401).json({ message: 'Not authorized' });
+            if (Post.userId != req.auth.userId && !req.auth.admin ) {
 
-            } else {
-                const filename = Post.imageUrl.split('/images/')[1];
+                res.status(401).json({ message: 'Not authorized ligne 85' });
+
+            } else if (Post.image) {
+                const filename = Post.image.split('/images/')[1];
                 fs.unlink(`images/${filename}`, () => {
                     Post.deleteOne({ _id: req.params.id })
                         .then(() => { res.status(200).json({ message: 'Post supprimé !' }) })
-                        .catch(error => res.status(401).json({ error }));
+                        .catch(error => res.status(401).json({ message: error }));
                 });
+
+            }else {
+                Post.deleteOne({ _id: req.params.id })
+                    .then(() => { res.status(200).json({ message: 'Post supprimé !' }) })
+                    .catch(error => res.status(401).json({ message: error }));
             }
         })
 
-        .catch(error => {
-            res.status(500).json({ error });
-        });
+        .catch(error => res.status(500).json({ message: error }));
 }
 
 exports.likePost = async (req, res, next) => {
@@ -93,6 +109,7 @@ exports.likePost = async (req, res, next) => {
 
     switch (req.body.like) {
 
+        
         case 1:                                                                     // Si like = 1 l'utilisateur aime le post, like enregistré si "userID" n'est pas présent dans le tableau [likers]
 
             Post.updateOne({ _id: req.params.id },
@@ -103,7 +120,7 @@ exports.likePost = async (req, res, next) => {
 
                 .then(() => { res.status(200).json({ message: 'Like + 1' }) })
                 .catch(error => res.status(400).json({ error }))
-
+            //}
             break
 
         case -1:                                                                    //Si like = -1 l'utilisateur n'aime pas la sauce like enregistré si "userID" n'est pas présent dans le tableau [dislikers]
@@ -156,9 +173,8 @@ exports.likePost = async (req, res, next) => {
             break
 
         default:
-            console.log(err, 'error')
 
-            break
+        break
 
     }
 
